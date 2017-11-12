@@ -2,7 +2,7 @@
 * text=auto
 
 $ cat .gitattributes
-*.rb linguist-language=R
+*.cls linguist-language=R
 
 # Custom for Visual Studio
 *.cs     diff=csharp
