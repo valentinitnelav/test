@@ -1,8 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-*.html linguist-documentation
-
 # Custom for Visual Studio
 *.cs     diff=csharp
 
