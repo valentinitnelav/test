@@ -1,7 +1,7 @@
 # /////////////////////////////////////////////////////////////////////////
 #
-# R script that can be run on a single core (cpu) by the job scheduler on the
-# cluster.
+# R script with the model that will be run on a single available core (cpu) 
+# by the job scheduler on the cluster.
 #
 # /////////////////////////////////////////////////////////////////////////
 
@@ -47,26 +47,16 @@ library(data.table)
 load(file = data_path)
 setDT(dt)
 
-# Sample with replacement the data tables
+# Sample with replacement the data table
 
 # The task id from the scheduler becomes the seed:
 task_id <- Sys.getenv("SGE_TASK_ID")
 # Print in the log file
 print(paste0("Random Number Generation using: set.seed(", task_id, ")"))
-
 set.seed(task_id)
 dt_sample <- dt[, .SD[sample(.N, replace = TRUE)], by = .(f1, f2)]
 
-# Models
-
-# Tune the convergence algorithm / optimizer
-controls <- list(optimizer = "nlminb",
-                 iter.max = 1000,
-                 step.min = 0.4,
-                 step.max = 0.5)
-
-# Land-use x Ecological specialization
-
+# The model
 boot_rmamv <- rma.mv(y ~ f2:f1 - 1,
                      V = var_y,
                      random = list(~ 1|r1,
@@ -74,10 +64,11 @@ boot_rmamv <- rma.mv(y ~ f2:f1 - 1,
                      R = list(r2 = cor_mat),
                      data = dt_sample,
                      method = "REML",
-                     control = controls)
+					 # Tune the convergence algorithm / optimizer
+                     control = list(optimizer = "nlminb",
+									iter.max = 1000,
+									step.min = 0.4,
+									step.max = 0.5))
 
-# Save model coefficients to the given "output" path that will be provided via
-# the .sh script when submitting the array job in the terminal
 coef_boot <- boot_rmamv[["beta"]]
-
 save(coef_boot, file = output)
