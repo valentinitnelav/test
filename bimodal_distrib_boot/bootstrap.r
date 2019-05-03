@@ -64,11 +64,11 @@ boot_rmamv <- rma.mv(y ~ f2:f1 - 1,
                      R = list(r2 = cor_mat),
                      data = dt_sample,
                      method = "REML",
-					 # Tune the convergence algorithm / optimizer
+                     # Tune the convergence algorithm / optimizer
                      control = list(optimizer = "nlminb",
-									iter.max = 1000,
-									step.min = 0.4,
-									step.max = 0.5))
+                                    iter.max = 1000,
+                                    step.min = 0.4,
+                                    step.max = 0.5))
 
 coef_boot <- boot_rmamv[["beta"]]
 save(coef_boot, file = output)
